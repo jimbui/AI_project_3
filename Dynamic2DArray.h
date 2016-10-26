@@ -180,7 +180,7 @@ public:
 	// Clears the array.
 	void Clear()
 	{
-		delete[,] dynArray;
+		delete[] dynArray;
 
 		numElementsX = 0;
 		numElementsY = 0;

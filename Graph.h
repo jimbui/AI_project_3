@@ -4,6 +4,9 @@
 #define GRAPH_H
 
 #include <iostream>
+#include <queue>
+#include <fstream>
+#include <math.h>
 #include "Dynamic2DArray.h"
 #include "Dynamic1DArray.h"
 
@@ -74,7 +77,7 @@ private:
 	// Gets the index of a vertex value.  -1 if vertex does not exist.
 	int GetVertexIndex(int v)
 	{
-		for (int i = 0; i < vertexCount; i++)
+		for (int i = 0; i < vertices->Length(); i++)
 			if (vertices->GetValue(i) == v)
 				return i;
 
@@ -96,13 +99,13 @@ private:
 		(*visiteded)[v1Index] = true;
 
 		// Find next edge
-		for (int i = 0; i < vertexCount; i++)
+		for (int i = 0; i < vertices->Length(); i++)
 		{
 			// int v2Index = GetVertexIndex(i);
 
 			// If v2 exists and has not been visited, go immediately to that vertex if an edge exists.
-			if (vertices[i] != -1 && !(*visiteded)[i] && edges[v1Index][i] != -1)
-				DFSRecursive(vertices[i], visiteded);
+			if (vertices->GetValue(i) != -1 && !(*visiteded)[i] && edges->GetValue(v1Index, i) != -1)
+				DFSRecursive(vertices->GetValue(i), visiteded);
 		}
 	}
 
