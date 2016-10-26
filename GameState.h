@@ -44,6 +44,9 @@ class GameState
 		delete currentGameBoard ;
 	}
 
+	// Accessors/Mutators
+	Graph<int>* GameBoard() { return currentGameBoard; };
+
 	void Expand()
 	{
 		// TODO:  Make child nodes according to legal moves.  Since directed graph from previous project is used,

@@ -296,8 +296,8 @@ public:
 		}
 	}
 
-	// Insert edge between v1 and v2
-	void InsertEdge(int v1, int v2, int edgeWeight, bool showOutput)
+	// Insert edge between v1 and v2.  Returns whether successful.
+	bool InsertEdge(int v1, int v2, int edgeWeight, bool showOutput)
 	{
 		// Try to insert edge between existing vertices
 		int vertex1Index = -1, vertex2Index = -1;
@@ -314,6 +314,8 @@ public:
 		{
 			if (showOutput)
 				cout << "Either one or both of the vertices do not exist." << endl;
+
+			return false;
 		}
 		else
 		{
@@ -321,14 +323,27 @@ public:
 			{
 				if (showOutput)
 					cout << "Invalid edge weight." << endl;
+
+				return false;
 			}
 			else
 			{
-				edges->ModifyOrInsertAt(vertex1Index, vertex2Index, edgeWeight);  // edges[vertex1Index][vertex2Index] = edgeWeight;
+				if (edges->GetValue(vertex1Index, vertex2Index) == edges->DefaultValue())
+				{
+					edges->ModifyOrInsertAt(vertex1Index, vertex2Index, edgeWeight);  // edges[vertex1Index][vertex2Index] = edgeWeight;
 
-				if (showOutput)
-					cout << "Edge from [" << vertices->GetValue(vertex1Index) << "] --(" << edgeWeight << ")--> ["
-					<< vertices->GetValue(vertex2Index) << "] added successfully." << endl;
+					if (showOutput)
+						cout << "Edge from [" << vertices->GetValue(vertex1Index) << "] --(" << edgeWeight << ")--> ["
+						<< vertices->GetValue(vertex2Index) << "] added successfully." << endl;
+
+					return true;
+				}
+				else
+				{
+					cout << "Edge already exists." << endl;
+
+					return false;
+				}
 			}
 		}
 	}
