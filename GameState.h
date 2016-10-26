@@ -9,19 +9,18 @@
 
 class GameState
 {
-private:
-	GameState* parent;
+	private:
 
-	Graph<int>* currentGameBoard;
-	int utilityFcn;
+	GameState* parent ; // points the parent gamestate that created this game state.
+	Graph<int>* currentGameBoard ; // this is the current board of this board.
+	int utilityFcn ; // the heuristic value.
 	
 
-	Dynamic1DArray<GameState*>* children;
+	Dynamic1DArray<GameState*>* children ; // all the children of this board.  assume max of 15 , not too sure.
 
 	// Add flags as necessary...
 
-	// Utility function
-	int GetUtility(Graph<int>* GameBoard)
+	int GetUtility(Graph<int>* GameBoard) // this is the heuristic function.
 	{
 		int utility = 0;
 
@@ -30,29 +29,28 @@ private:
 		return utility;
 	}
 
-public:
+	public:
+
 	GameState(GameState* Parent, Graph<int>* GameBoard)
 	{
-		parent = Parent;
-		currentGameBoard = GameBoard;
-		children = new Dynamic1DArray<GameState*>(NULL);
-
-		utilityFcn = GetUtility(currentGameBoard);
+		parent = Parent ;
+		currentGameBoard = GameBoard ;
+		children = new Dynamic1DArray<GameState*>(NULL) ;
+		utilityFcn = GetUtility(currentGameBoard) ;
 	}
 
 	~GameState()
 	{
-		delete currentGameBoard;
+		delete currentGameBoard ;
 	}
 
-	// Expand() function
 	void Expand()
 	{
 		// TODO:  Make child nodes according to legal moves.  Since directed graph from previous project is used,
 		// be sure to insert 2 edges:  1 going to and one coming from.
 	}
 
-	Dynamic1DArray<GameState*>* GetChildren() { return children; };
-};
+	Dynamic1DArray<GameState*>* GetChildren() { return children ; } ;
+} ;
 
 #endif
