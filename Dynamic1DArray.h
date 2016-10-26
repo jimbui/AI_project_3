@@ -4,7 +4,6 @@
 #define DYNAMIC1DARRAY_H
 
 #include <iostream>
-#include "Node.h"
 
 using namespace std;
 
