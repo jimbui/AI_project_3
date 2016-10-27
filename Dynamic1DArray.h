@@ -75,6 +75,17 @@ public:
 		delete[] dynArray;
 	}
 
+	// Deep copy
+	Dynamic1DArray* Copy()
+	{
+		Dynamic1DArray* copiedArray = new Dynamic1DArray(defaultValue);
+
+		for (int i = 0; i < numElements; i++)
+			copiedArray->Add(dynArray[i]);
+
+		return copiedArray;
+	}
+
 	// Accessors/Mutators
 	int Length() const { return numElements; };
 

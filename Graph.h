@@ -176,6 +176,17 @@ public:
 		delete edges;
 	}
 
+	// Deep copy
+	Graph* Copy()
+	{
+		Graph* copiedGraph = new Graph();
+
+		copiedGraph->vertices = vertices->Copy();
+		copiedGraph->edges = edges->Copy();
+
+		return copiedGraph;
+	}
+
 	// Accessors ---------------------------------------------------
 	// int ArraySize() const { return arraySize; };
 	int VertexCount() const { return vertices->Length(); };
@@ -225,6 +236,13 @@ public:
 			cout << "Graph Built." << endl;
 		}
 		else cout << "Unable to open file";
+	}
+
+	// Build default graph for game.
+	void BuildGameGraph()
+	{
+		for (int i = 1; i <= 6; i++)
+			InsertVertex(i, false);
 	}
 
 	// Debug-Only Accessors ----------------------------------------------
@@ -314,6 +332,9 @@ public:
 	{
 		int k = 1 ;
 		// std::cout << " \n" ;
+
+		// int opCount = 0;
+
 		for (int i = 0 ; i < vertices->Length() ; i++)
 		{
 			for (int j = 0 ; j < vertices->Length() ; j++)
@@ -343,6 +364,8 @@ public:
 
 								for (int g = 0 ; g < vertices->Length() ; g++)
 								{
+									// opCount++;
+
 									if (edges->GetValue(k , g) == currentPlayer && (g == i || k == i) && checked_array[k][g] != 1) // every third tier node that belongs to player and is triangle.
 									{
 										// std::cout << "        [+]    edge " << k + 1 << "->" << g + 1 << " belongs to player " << currentPlayer << ". \n" ;

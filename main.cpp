@@ -12,13 +12,14 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 	int turn = 1 ; // this is the turn counter.
 
 	// generate six starting vertices for graph , for a hexagon.  graffiti->InsertVertex(int , bool):  int is value of vertex , bool is just a flag for displaying error messages.  
+	graffiti->BuildGameGraph();
 
-	graffiti->InsertVertex(1, false) ;
+	/*graffiti->InsertVertex(1, false) ;
 	graffiti->InsertVertex(2, false) ;
 	graffiti->InsertVertex(3, false) ;
 	graffiti->InsertVertex(4, false) ;
 	graffiti->InsertVertex(5, false) ;
-	graffiti->InsertVertex(6, false) ;
+	graffiti->InsertVertex(6, false) ;*/
 
 	GameState* gameBoard = new GameState(NULL, graffiti) ; // store graph in game board
 
@@ -94,6 +95,8 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 		std::cout << "[+] MOVE SELECTED: \n\n" ;
 		gameBoard->GameBoard()->Print() ; // prints the board that you moves.
 
+		// int numOps = 0;
+
 		if (graffiti->TriangleDetected(currentPlayer)) // lose condition.
 		{
 			std::cout << "[-] PLAYER " << currentPlayer << " HAS LOST THE GAME BY CREATING A TRIANGLE!  GAME EXITING! \n\n" ;
@@ -117,6 +120,33 @@ int main(void)
 		 << " \n" ;
 
 	Play2PlayerGame() ;
+
+	// Graph<int>* g = new Graph<int>();
+
+	// g->BuildGameGraph();
+
+	// Graph<int>* h = g->Copy();
+
+	// Create another test graph.
+
+	/*Graph<int>* graffiti = new Graph<int>();
+
+	graffiti->BuildGameGraph();
+
+	graffiti->InsertEdge(1, 2, 2, false);
+	graffiti->InsertEdge(2, 3, 2, false);
+	graffiti->InsertEdge(3, 4, 2, false);
+	graffiti->InsertEdge(4, 5, 2, false);
+	graffiti->InsertEdge(5, 6, 2, false);
+	graffiti->InsertEdge(5, 1, 1, false);
+	graffiti->InsertEdge(5, 2, 1, false);
+
+	graffiti->Print();
+
+	int opCount = 0;
+
+	cout << "Triangle Detected:  " << (graffiti->TriangleDetected(2, opCount) ? "Yes" : "No") << endl;
+	cout << "Number of Operations:  " << opCount << endl;*/
 
 	// Create test graph...
 	/*Graph<int>* graffiti = new Graph<int>();

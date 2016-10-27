@@ -98,6 +98,18 @@ public:
 		delete[] dynArray;
 	}
 
+	// Deep copy
+	Dynamic2DArray* Copy()
+	{
+		Dynamic2DArray* copiedArray = new Dynamic2DArray(defaultValue, isSquare);
+
+		for (int i = 0; i < numElementsY; i++)
+			for (int j = 0; j < numElementsX; j++)
+				copiedArray->ModifyOrInsertAt(j, i, dynArray[i][j]);
+
+		return copiedArray;
+	}
+
 	// Accessors/Mutators
 	int Length() const { return numElementsX * numElementsY; };
 
@@ -180,7 +192,8 @@ public:
 	// Clears the array.
 	void Clear()
 	{
-		delete[] dynArray;
+		for (int i = 0; i < arraySizeY; i++)
+			delete[] dynArray[i];
 
 		numElementsX = 0;
 		numElementsY = 0;

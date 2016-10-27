@@ -15,16 +15,38 @@ class GameState
 	Graph<int>* currentGameBoard ; // this is the current board of this board.
 	int utilityFcn ; // the heuristic value.
 	
+	// Contains depth flag to determine significance of win and loss?
 
 	Dynamic1DArray<GameState*>* children ; // all the children of this board.  assume max of 15 , not too sure.
 
 	// Add flags as necessary...
 
-	int GetUtility(Graph<int>* GameBoard) // this is the heuristic function.
+	int GetUtility(Graph<int>* GameBoard, int winWeight, int lossWeight) // this is the heuristic function.
 	{
 		int utility = 0;
 
 		// TODO:  Add method to determine the correct utility function.
+
+		/********************************************************************
+		*	h(n)	= ['Personal Winning Factors'] - ['Losing Factors']
+		*			= [Available Move] + N * [Win] - M * [Loss]
+		*
+		*	N and M are weighted values.  Note that if there is a sequence 
+		*	with many wins, the CPU should consider this as a better path
+		*	than one with many losses, even if the supposed number of 
+		*	available moves is the same.
+		*	
+		*	Minimax requires that "the computer should make the move which 
+		*	leaves its opponent capable of doing the least damage."  Thus,
+		*	the only thing to consider would be total number of available
+		*	moves.
+		*	
+		********************************************************************/
+
+		// How to compute...  Look at potential child nodes and determine utility
+		// of each.
+
+		// Do some stuff.
 
 		return utility;
 	}
@@ -36,7 +58,7 @@ class GameState
 		parent = Parent ;
 		currentGameBoard = GameBoard ;
 		children = new Dynamic1DArray<GameState*>(NULL) ;
-		utilityFcn = GetUtility(currentGameBoard) ;
+		utilityFcn = GetUtility(currentGameBoard, 1, 1;
 	}
 
 	~GameState()
@@ -58,30 +80,31 @@ class GameState
 
 		Graph<int>* copyGameBoard[30] ; // make 15 boards.  15 because that is the max amount of moves at any given time.
 
-		for (int k = 0 ; k < 30 ; k++) copyGameBoard[k] = new Graph<int>() ; // initialize all 15 boards.
+		// I made deep copy functions.
+		for (int k = 0 ; k < 30 ; k++) copyGameBoard[k] = currentGameBoard->Copy(); // initialize all 15 boards.
 
-		for (int k = 0 ; k < 30 ; k++) // deep copy of edges and vertices from current board to each board.
-		{
-			copyGameBoard[k]->InsertVertex(1, false) ;
-			copyGameBoard[k]->InsertVertex(2, false) ;
-			copyGameBoard[k]->InsertVertex(3, false) ;
-			copyGameBoard[k]->InsertVertex(4, false) ;
-			copyGameBoard[k]->InsertVertex(5, false) ;
-			copyGameBoard[k]->InsertVertex(6, false) ;
+		//for (int k = 0 ; k < 30 ; k++) // deep copy of edges and vertices from current board to each board.
+		//{
+		//	copyGameBoard[k]->InsertVertex(1, false) ;
+		//	copyGameBoard[k]->InsertVertex(2, false) ;
+		//	copyGameBoard[k]->InsertVertex(3, false) ;
+		//	copyGameBoard[k]->InsertVertex(4, false) ;
+		//	copyGameBoard[k]->InsertVertex(5, false) ;
+		//	copyGameBoard[k]->InsertVertex(6, false) ;
 
-			for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++) 
-			{
-				for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
-				{
-					copyGameBoard[k]->InsertEdge(i + 1 , j + 1, currentGameBoard->edges->GetValue(i , j) , false) ;
-				}
-			}
-		}
+		//	for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++) 
+		//	{
+		//		for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
+		//		{
+		//			copyGameBoard[k]->InsertEdge(i + 1 , j + 1, currentGameBoard->edges->GetValue(i , j) , false) ;
+		//		}
+		//	}
+		//}
 
 		// to avoid repeats.
 
-		int i_array[currentGameBoard->vertices->Length()] = {0 , 0 , 0 , 0 , 0 , 0} ;
-		int j_array[currentGameBoard->vertices->Length()] = {0 , 0 , 0 , 0 , 0 , 0} ;
+		int i_array[6 /*currentGameBoard->vertices->Length()*/] = {0 , 0 , 0 , 0 , 0 , 0} ;
+		int j_array[6 /*currentGameBoard->vertices->Length()*/] = {0 , 0 , 0 , 0 , 0 , 0} ;
 
 		for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++) // this generates the moves.
 		{
@@ -105,6 +128,8 @@ class GameState
 		{
 			std::cout << "   -------------------------------------------\n" ;
 			std::cout << "          [" << i + 1 << "]: " ;
+
+			// int numOps = 0;
 
 			if (copyGameBoard[i]->TriangleDetected(currentPlayer)) std::cout << "TRIANGLE DETECTED. \n\n" ;
 			else std::cout << "triangle not detected. \n\n" ;
