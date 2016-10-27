@@ -337,11 +337,14 @@ public:
 				{
 					if (edges->GetValue(vertex1Index, vertex2Index) == edges->DefaultValue())
 					{
-						edges->ModifyOrInsertAt(vertex1Index, vertex2Index, edgeWeight);  // edges[vertex1Index][vertex2Index] = edgeWeight;
-
+						edges->ModifyOrInsertAt(vertex1Index, vertex2Index, edgeWeight); // edges[vertex1Index][vertex2Index] = edgeWeight;
+						edges->ModifyOrInsertAt(vertex2Index, vertex1Index, edgeWeight); // since this graph is undirected , this adds the other edge. 
 						if (showOutput)
 							cout << "    Edge from [" << vertices->GetValue(vertex1Index) << "] --(" << edgeWeight << ")--> ["
 							<< vertices->GetValue(vertex2Index) << "] added successfully. \n" << endl;
+						if (showOutput)
+							cout << "    Edge from [" << vertices->GetValue(vertex2Index) << "] --(" << edgeWeight << ")--> ["
+							<< vertices->GetValue(vertex1Index) << "] added successfully. \n" << endl;
 
 						return true;
 					}

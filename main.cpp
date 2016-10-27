@@ -47,13 +47,14 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		cout << "[+] It's player " << currentPlayer << "'s turn.  Do you want to quit yet?  (y) or (n)" << endl << endl << "        " ;
 		cin >> ui ;
-		std::cout << " \n" ;
 
 		while (ui != 'y' && ui != 'n')
 		{
-			cout << "\n    I'm sorry.  I didn't get that.  Please enter (n) to quit and (y) to keep playing:  " << endl << endl << "        " ;
+			cout << "\n    I'm sorry.  I didn't get that.  Please enter (y) to quit and (n) to keep playing:  " << endl << endl << "        " ;
 			cin >> ui ;
 		}
+
+		std::cout << " \n" ;
 
 		if (ui == 'y')
 			break ;
