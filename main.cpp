@@ -7,10 +7,11 @@ using namespace std ;
 
 void Play2PlayerGame() // test for playing two player game , hotseat version.
 {
-	Graph<int>* graffiti = new Graph<int>() ; // starting graph.
-	srand(time(NULL)) ; // random seed for the rand() , else it give sthe same number every time.
-	int turn = 1 ; 
-	// Generate 6 starting vertices for graph , for a hexagon.  graffiti->InsertVertex(int , bool):  int is value of vertex , bool is just a flag for displaying error messages.  
+	Graph<int>* graffiti = new Graph<int>() ; 
+	srand(time(NULL)) ; // random seed for the rand() , else it gives the same number every time.
+	int turn = 1 ; // this is the turn counter.
+
+	// generate six starting vertices for graph , for a hexagon.  graffiti->InsertVertex(int , bool):  int is value of vertex , bool is just a flag for displaying error messages.  
 
 	graffiti->InsertVertex(1, false) ;
 	graffiti->InsertVertex(2, false) ;
@@ -21,16 +22,16 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 	GameState* gameBoard = new GameState(NULL, graffiti) ; // store graph in game board
 
-	bool isPlayerOne = false ;
+	bool isPlayerOne = false ; // this is the device for taking turns.
 
 	// std::cout << "\nseed: " << rand() << " \n" ;
 
-	if (rand() % 2 == 1)
+	if (rand() % 2 == 1) // picks a player to start.
 	{
 		isPlayerOne = true ; 
 	}
 
-	int currentPlayer = -99999 ;
+	int currentPlayer = -99999 ; // just a place holder value.
 
 	// start game!
 
@@ -45,11 +46,16 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		std::cout << "/**************************************** BELOW IS TURN " << turn << " **************************************************/ \n\n" ;
 
-		gameBoard->GameBoard()->Print() ; // displays the gameboard on the command line. 
+		std::cout << "[+] CURRENT GAME BOARD: \n\n" ;
 
+		gameBoard->GameBoard()->Print() ; // displays the gameboard on the command line. 
 		cout << endl ;
 
-		cout << "[+] It's player " << currentPlayer << "'s turn.  Do you want to quit yet?  (y) or (n)" << endl << endl << "        " ;
+		/*
+
+		// i commented this out because it was a pain to keep hitting no.
+
+		cout << "[+] It's player " << currentPlayer << "'s turn.  Do you want to quit yet?  (y) or (n).  Resistance is futile." << endl << endl << "        " ;
 		cin >> ui ;
 
 		while (ui != 'y' && ui != 'n')
@@ -62,6 +68,12 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		if (ui == 'y')
 			break ;
+
+		*/
+
+		gameBoard->Expand(currentPlayer) ; // this shows all the possible moves.
+
+		cout << "[+] It's player " << currentPlayer << "'s turn. \n\n" ;
 
 		do // for the love of god , enter an integer.  
 		{
@@ -77,15 +89,16 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 		} 
 		while (!gameBoard->GameBoard()->InsertEdge(startVertex, endVertex, currentPlayer, true));
 
-		isPlayerOne = !isPlayerOne ;
+		isPlayerOne = !isPlayerOne ; // switches players.  this really should be moved to the end , but would break alot of functions.
 
-		if (false)
+		std::cout << "[+] MOVE SELECTED: \n\n" ;
+		gameBoard->GameBoard()->Print() ; // prints the board that you moves.
+
+		if (graffiti->TriangleDetected(currentPlayer)) // lose condition.
 		{
-			std::cout << "[-] PLAYER " << currentPlayer << " HAS LOST THE GAME BY CREATING A TRIANGLE!  GAME EXITING! \n" ;
+			std::cout << "[-] PLAYER " << currentPlayer << " HAS LOST THE GAME BY CREATING A TRIANGLE!  GAME EXITING! \n\n" ;
 			break ;
 		}
-
-		gameBoard->Expand(currentPlayer) ;
 
 		cout << endl;
 

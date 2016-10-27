@@ -1,5 +1,14 @@
 // Implements a graph using adjacency matrix representation
 
+/*
+
+	FOR JOHN:
+
+		bool TriangleDetected(int currentPlayer) was implemented and placed in the main().  not fully tested yet , 
+		but promising results.  on line 313.
+
+*/
+
 #ifndef GRAPH_H
 #define GRAPH_H
 
@@ -238,6 +247,9 @@ public:
 	}
 
 	// Returns whether there is a triangle anywhere in the graph.
+
+	/*
+
 	bool TriangleDetection(int v, int playerNum)
 	{
 		cout << "Forward IDFS:" << endl << endl;
@@ -249,6 +261,8 @@ public:
 
 		return ForwardIDFSRecursive(v, 3, v, playerNum, 3, &depthFlag);
 	}
+
+	*/
 
 	// Performs standard BFS on Graph
 	void BFS(int v)
@@ -296,7 +310,56 @@ public:
 		}
 	}
 
-	// Checks the entire graph for triangles.
+	bool TriangleDetected(int currentPlayer) // black magic.  uncomment to debug.
+	{
+		int k = 1 ;
+		// std::cout << " \n" ;
+		for (int i = 0 ; i < vertices->Length() ; i++)
+		{
+			for (int j = 0 ; j < vertices->Length() ; j++)
+			{
+				if (i < j) // iterate each edge only once.
+				{
+					// std::cout << "looking at i: " << i + 1 << " and j: " << j + 1 << " , run# " << k << " , value: " << edges->GetValue(i , j) <<" \n" ;
+					k++ ;
+
+					int checked_array[6][6] = {0} ; // the anti-repeat device.
+
+					if (edges->GetValue(i , j) == currentPlayer && i < j) // every first tier node that belongs to player.
+					{
+						checked_array[i][j] = 1 ;
+						checked_array[j][i] = 1 ;
+
+						// std::cout << "[+]    edge " << i + 1 << "->" << j + 1 << " belongs to player " << currentPlayer << ". \n" ;
+
+						for (int k = 0 ; k < vertices->Length() ; k++)
+						{
+							if (edges->GetValue(j , k) == currentPlayer && checked_array[j][k] != 1) // every second tier node that belongs to player.
+							{
+								checked_array[j][k] = 1 ;
+								checked_array[k][j] = 1 ;
+
+								// std::cout << "    [+]    edge " << j + 1 << "->" << k + 1 << " belongs to player " << currentPlayer << ". \n" ;
+
+								for (int g = 0 ; g < vertices->Length() ; g++)
+								{
+									if (edges->GetValue(k , g) == currentPlayer && (g == i || k == i) && checked_array[k][g] != 1) // every third tier node that belongs to player and is triangle.
+									{
+										// std::cout << "        [+]    edge " << k + 1 << "->" << g + 1 << " belongs to player " << currentPlayer << ". \n" ;
+										return true ;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return false ;
+	}
+
+	/*
 
 	bool TriangleDetection()
 	{
@@ -315,6 +378,8 @@ public:
 		return false;
 	}
 
+	*/
+
 	// End Debug-Only Accessors ------------------------------------------
 
 	// Dijkstra's Algorithm on adjacency matrix --------------------------------------------
@@ -326,6 +391,7 @@ public:
 
 	// Mutators ----------------------------------------------------
 	// Insert vertex of value v
+
 	void InsertVertex(int v, bool showOutput)
 	{
 		// Check to see if vertex being added exists already or is invalid

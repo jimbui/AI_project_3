@@ -49,12 +49,14 @@ class GameState
 
 	void Expand(int currentPlayer)
 	{
-		int nextPlayer = 1 ;
-		if (currentPlayer == 1) nextPlayer = 2 ;
+		// next two lines are redundant , will fix later.
+		
+		int nextPlayer = 2 ;
+		if (currentPlayer == 1) nextPlayer = 1 ;
 
 		int move_count = 0 ;
 
-		Graph<int>* copyGameBoard[30] ; // make fucking 15 boards.  15 because that is the max amount of moves at any given time.
+		Graph<int>* copyGameBoard[30] ; // make 15 boards.  15 because that is the max amount of moves at any given time.
 
 		for (int k = 0 ; k < 30 ; k++) copyGameBoard[k] = new Graph<int>() ; // initialize all 15 boards.
 
@@ -67,7 +69,7 @@ class GameState
 			copyGameBoard[k]->InsertVertex(5, false) ;
 			copyGameBoard[k]->InsertVertex(6, false) ;
 
-			for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++)
+			for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++) 
 			{
 				for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
 				{
@@ -76,14 +78,16 @@ class GameState
 			}
 		}
 
+		// to avoid repeats.
+
 		int i_array[currentGameBoard->vertices->Length()] = {0 , 0 , 0 , 0 , 0 , 0} ;
 		int j_array[currentGameBoard->vertices->Length()] = {0 , 0 , 0 , 0 , 0 , 0} ;
 
-		for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++)
+		for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++) // this generates the moves.
 		{
 			for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
 			{
-				if(j_array[j] == 0 || i_array[i] == 0)
+				if((j_array[j] == 0 || i_array[i] == 0) && i != j)
 				{
 					if (copyGameBoard[move_count]->InsertEdge(i + 1 , j + 1 , nextPlayer , false)) 
 					{
@@ -97,8 +101,14 @@ class GameState
 
 		std::cout << "[+] POSSIBLE GAME BOARDS: \n\n" ;
 
-		for (int i = 0 ; i < move_count ; i++)
+		for (int i = 0 ; i < move_count ; i++) // this prints the possible boards.
 		{
+			std::cout << "   -------------------------------------------\n" ;
+			std::cout << "          [" << i + 1 << "]: " ;
+
+			if (copyGameBoard[i]->TriangleDetected(currentPlayer)) std::cout << "TRIANGLE DETECTED. \n\n" ;
+			else std::cout << "triangle not detected. \n\n" ;
+
 			copyGameBoard[i]->Print() ;
 		}
 
