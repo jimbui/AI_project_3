@@ -51,6 +51,26 @@ class GameState
 	{
 		// TODO:  Make child nodes according to legal moves.  Since directed graph from previous project is used,
 		// be sure to insert 2 edges:  1 going to and one coming from.
+		Graph<int> copyGameBoard ;
+		std::cout << "[+] POSSIBLE GAME BOARDS: \n\n" ;
+
+		copyGameBoard.InsertVertex(1, false) ;
+		copyGameBoard.InsertVertex(2, false) ;
+		copyGameBoard.InsertVertex(3, false) ;
+		copyGameBoard.InsertVertex(4, false) ;
+		copyGameBoard.InsertVertex(5, false) ;
+		copyGameBoard.InsertVertex(6, false) ;
+
+		for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++)
+		{
+			for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
+			{
+				copyGameBoard.InsertEdge(i + 1 , j + 1, currentGameBoard->edges->GetValue(i , j) , false) ;
+				// std::cout << currentGameBoard->edges->GetValue(i , j) << " \n" ;
+			}
+		}
+
+		copyGameBoard.Print() ;
 	}
 
 	Dynamic1DArray<GameState*>* GetChildren() { return children ; } ;

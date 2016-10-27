@@ -9,7 +9,7 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 {
 	Graph<int>* graffiti = new Graph<int>() ; // starting graph.
 	srand(time(NULL)) ; // random seed for the rand() , else it give sthe same number every time.
-
+	int turn = 1 ; 
 	// Generate 6 starting vertices for graph , for a hexagon.  graffiti->InsertVertex(int , bool):  int is value of vertex , bool is just a flag for displaying error messages.  
 
 	graffiti->InsertVertex(1, false) ;
@@ -42,6 +42,8 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		if (isPlayerOne == true) currentPlayer = 1 ;
 		else currentPlayer = 2 ;
+
+		std::cout << "/**************************************** BELOW IS TURN " << turn << " **************************************************/ \n\n" ;
 
 		gameBoard->GameBoard()->Print() ; // displays the gameboard on the command line. 
 
@@ -77,7 +79,19 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		isPlayerOne = !isPlayerOne ;
 
+		if (false)
+		{
+			std::cout << "[-] PLAYER " << currentPlayer << " HAS LOST THE GAME BY CREATING A TRIANGLE!  GAME EXITING! \n" ;
+			break ;
+		}
+
+		gameBoard->Expand() ;
+
 		cout << endl;
+
+		std::cout << "/**************************************** ABOVE IS TURN " << turn << " **************************************************/ \n\n" ;
+
+		turn++ ;
 	}
 }
 
