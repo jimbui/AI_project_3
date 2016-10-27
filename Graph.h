@@ -289,7 +289,7 @@ public:
 				cout << "Vertex of value " << v << " successfully added." << endl;
 
 			edges->ModifyOrInsertAt(vertices->Length(), vertices->Length(), edges->DefaultValue());
-			vertices->Add(v);
+			vertices->Add(v) ; // adds vertex v to end of a dynamic array. 
 
 			/*if (vertexCount == arraySize)
 				ResizeArrays();*/
@@ -297,52 +297,60 @@ public:
 	}
 
 	// Insert edge between v1 and v2.  Returns whether successful.
-	bool InsertEdge(int v1, int v2, int edgeWeight, bool showOutput)
+	bool InsertEdge(int v1, int v2, int edgeWeight, bool showOutput) 
 	{
-		// Try to insert edge between existing vertices
-		int vertex1Index = -1, vertex2Index = -1;
-
-		for (int i = 0; i < vertices->Length(); i++)
+		if(v1 == v2) // cannot insert edge between the same vertices.
 		{
-			if (vertices->GetValue(i) == v1)
-				vertex1Index = i;
-			if (vertices->GetValue(i) == v2)
-				vertex2Index = i;
+			return false ;
 		}
 
-		if (vertex1Index == -1 || vertex2Index == -1)
-		{
-			if (showOutput)
-				cout << "Either one or both of the vertices do not exist." << endl;
-
-			return false;
-		}
 		else
 		{
-			if (edgeWeight <= 0)
+			// Try to insert edge between existing vertices
+			int vertex1Index = -1, vertex2Index = -1;
+
+			for (int i = 0; i < vertices->Length(); i++)
+			{
+				if (vertices->GetValue(i) == v1)
+					vertex1Index = i;
+				if (vertices->GetValue(i) == v2)
+					vertex2Index = i;
+			}
+
+			if (vertex1Index == -1 || vertex2Index == -1)
 			{
 				if (showOutput)
-					cout << "Invalid edge weight." << endl;
+					cout << "    Either one or both of the vertices do not exist. \n" << endl;
 
 				return false;
 			}
 			else
 			{
-				if (edges->GetValue(vertex1Index, vertex2Index) == edges->DefaultValue())
+				if (edgeWeight <= 0)
 				{
-					edges->ModifyOrInsertAt(vertex1Index, vertex2Index, edgeWeight);  // edges[vertex1Index][vertex2Index] = edgeWeight;
-
 					if (showOutput)
-						cout << "Edge from [" << vertices->GetValue(vertex1Index) << "] --(" << edgeWeight << ")--> ["
-						<< vertices->GetValue(vertex2Index) << "] added successfully." << endl;
+						cout << "Invalid edge weight." << endl;
 
-					return true;
+					return false;
 				}
 				else
 				{
-					cout << "Edge already exists." << endl;
+					if (edges->GetValue(vertex1Index, vertex2Index) == edges->DefaultValue())
+					{
+						edges->ModifyOrInsertAt(vertex1Index, vertex2Index, edgeWeight);  // edges[vertex1Index][vertex2Index] = edgeWeight;
 
-					return false;
+						if (showOutput)
+							cout << "    Edge from [" << vertices->GetValue(vertex1Index) << "] --(" << edgeWeight << ")--> ["
+							<< vertices->GetValue(vertex2Index) << "] added successfully. \n" << endl;
+
+						return true;
+					}
+					else
+					{
+						cout << "    Edge already exists. \n" << endl;
+
+						return false;
+					}
 				}
 			}
 		}
@@ -351,20 +359,20 @@ public:
 	// Display -----------------------------------------------------
 	void Print()
 	{
-		cout << "Graph Vertices:  " << endl;
+		cout << "    Graph Vertices: \n" << endl;
 
 		if (vertices->Length() == 0)
 		{
-			cout << "Graph is empty." << endl;
+			cout << "        Graph is empty." << endl;
 			// return;
 		}
 
 		for (int i = 0; i < vertices->Length(); i++)
-			cout << "Vertex[" << i << "] = " << vertices->GetValue(i) << endl;
+			cout << "        Vertex[" << i << "] = " << vertices->GetValue(i) << endl;
 
 		cout << endl;
 
-		cout << "Graph Edges:  " << endl;
+		cout << "    Graph Edges: \n" << endl;
 
 
 		for (int i = 0; i < vertices->Length() + 2; i++)
@@ -377,9 +385,9 @@ public:
 					if ((i == 0 && j == 0) || (i == 1 && j == 1))
 						cout << "     ";  // 5 spaces
 					else if (i == 0 && j == 1)
-						cout << "   To";
+						cout << "       To";
 					else
-						cout << "From ";
+						cout << "    From ";
 				}
 				else
 				{
@@ -395,7 +403,7 @@ public:
 						if (j == 0)
 							cout << GetFormatting(vertices->GetValue(i - 2), 5).c_str() << vertices->GetValue(i - 2);
 						if (j == 1)
-							cout << "    |";  // 1 right boundary
+							cout << "        |";  // 1 right boundary
 					}
 
 					if (j > 1 && i > 1)  // Print values

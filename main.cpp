@@ -1,61 +1,78 @@
 #include <iostream>
 #include "GameState.h"
 
-using namespace std;
+using namespace std ;
 
-// Test for playing two player game
-void Play2PlayerGame()
+void Play2PlayerGame() // test for playing two player game , hotseat version.
 {
-	// Starting graph
-	Graph<int>* graffiti = new Graph<int>();
+	Graph<int>* graffiti = new Graph<int>() ; // starting graph.
+	srand(time(NULL)) ; // random seed for the rand() , else it give sthe same number every time.
 
-	// Generate 6 starting vertices for graph
-	graffiti->InsertVertex(1, false);
-	graffiti->InsertVertex(2, false);
-	graffiti->InsertVertex(3, false);
-	graffiti->InsertVertex(4, false);
-	graffiti->InsertVertex(5, false);
-	graffiti->InsertVertex(6, false);
+	// Generate 6 starting vertices for graph , for a hexagon.  graffiti->InsertVertex(int , bool):  int is value of vertex , bool is just a flag for displaying error messages.  
 
-	// Store graph in game board
-	GameState* gameBoard = new GameState(NULL, graffiti);
+	graffiti->InsertVertex(1, false) ;
+	graffiti->InsertVertex(2, false) ;
+	graffiti->InsertVertex(3, false) ;
+	graffiti->InsertVertex(4, false) ;
+	graffiti->InsertVertex(5, false) ;
+	graffiti->InsertVertex(6, false) ;
 
-	// Coin toss --> Player starting game is chosen at random.
-	int currentPlayer = 1 + rand() % 2;
+	GameState* gameBoard = new GameState(NULL, graffiti) ; // store graph in game board
 
-	// Start game
-	while (true)
+	bool isPlayerOne = false ;
+
+	// std::cout << "\nseed: " << rand() << " \n" ;
+
+	if (rand() % 2 == 1)
 	{
-		int startVertex;
-		int endVertex;
-		char ui;
+		isPlayerOne = true ; 
+	}
 
-		gameBoard->GameBoard()->Print();
+	int currentPlayer = -99999 ;
 
-		cout << endl;
+	// start game!
 
-		cout << "It's player " << currentPlayer << "'s turn.  Do you want to quit yet?  (y) or (n)" << endl << endl;
-		cin >> ui;
+	while (true) 
+	{
+		int startVertex ;
+		int endVertex ;
+		char ui ;
+
+		if (isPlayerOne == true) currentPlayer = 1 ;
+		else currentPlayer = 2 ;
+
+		gameBoard->GameBoard()->Print() ; // displays the gameboard on the command line. 
+
+		cout << endl ;
+
+		cout << "[+] It's player " << currentPlayer << "'s turn.  Do you want to quit yet?  (y) or (n)" << endl << endl << "        " ;
+		cin >> ui ;
+		std::cout << " \n" ;
 
 		while (ui != 'y' && ui != 'n')
 		{
-			cout << "I'm sorry.  I didn't get that.  Please enter (y) to quit and (n) to keep playing:  ";
-			cin >> ui;
+			cout << "\n    I'm sorry.  I didn't get that.  Please enter (n) to quit and (y) to keep playing:  " << endl << endl << "        " ;
+			cin >> ui ;
 		}
 
 		if (ui == 'y')
-			break;
+			break ;
 
-		do
+		do // for the love of god , enter an integer.  
 		{
-			cout << "Enter starting vertex:  ";
-			cin >> startVertex;
-			cout << "Enter ending vertex:  ";
-			cin >> endVertex;
+			cout << "    Enter starting vertex:  " << endl ;
+			std::cout << " \n        " ;
+			cin >> startVertex ;
+			std::cout << " \n" ;
+			cout << "    Enter ending vertex:  " << endl << endl << "        " ;
+			cin >> endVertex ;
+			std::cout << " \n" ;
+
+			if (startVertex == endVertex) std::cout << "    You cannot insert between duplicate edges.\n" ; // this is just the error message.  logical implementation is in "Graph.h".
 		} 
 		while (!gameBoard->GameBoard()->InsertEdge(startVertex, endVertex, currentPlayer, true));
 
-		// Make player alternate.
+		isPlayerOne = !isPlayerOne ;
 
 		cout << endl;
 	}
@@ -63,9 +80,13 @@ void Play2PlayerGame()
 
 int main(void)
 {
-	cout << "......................      BOO!!!!!!!" << endl;
+	cout << " \n" 
+		 << "/***********************************************************************************************************/\n"      
+         << "/*                                       welcome to the hexagon game!                                      */\n" 
+         << "/***********************************************************************************************************/\n"
+		 << " \n" ;
 
-	Play2PlayerGame();
+	Play2PlayerGame() ;
 
 	// Create test graph...
 	/*Graph<int>* graffiti = new Graph<int>();
