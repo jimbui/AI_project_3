@@ -47,30 +47,64 @@ class GameState
 	// Accessors/Mutators
 	Graph<int>* GameBoard() { return currentGameBoard; };
 
-	void Expand()
+	void Expand(int currentPlayer)
 	{
-		// TODO:  Make child nodes according to legal moves.  Since directed graph from previous project is used,
-		// be sure to insert 2 edges:  1 going to and one coming from.
-		Graph<int> copyGameBoard ;
-		std::cout << "[+] POSSIBLE GAME BOARDS: \n\n" ;
+		int nextPlayer = 1 ;
+		if (currentPlayer == 1) nextPlayer = 2 ;
 
-		copyGameBoard.InsertVertex(1, false) ;
-		copyGameBoard.InsertVertex(2, false) ;
-		copyGameBoard.InsertVertex(3, false) ;
-		copyGameBoard.InsertVertex(4, false) ;
-		copyGameBoard.InsertVertex(5, false) ;
-		copyGameBoard.InsertVertex(6, false) ;
+		int move_count = 0 ;
+
+		Graph<int>* copyGameBoard[30] ; // make fucking 15 boards.  15 because that is the max amount of moves at any given time.
+
+		for (int k = 0 ; k < 30 ; k++) copyGameBoard[k] = new Graph<int>() ; // initialize all 15 boards.
+
+		for (int k = 0 ; k < 30 ; k++) // deep copy of edges and vertices from current board to each board.
+		{
+			copyGameBoard[k]->InsertVertex(1, false) ;
+			copyGameBoard[k]->InsertVertex(2, false) ;
+			copyGameBoard[k]->InsertVertex(3, false) ;
+			copyGameBoard[k]->InsertVertex(4, false) ;
+			copyGameBoard[k]->InsertVertex(5, false) ;
+			copyGameBoard[k]->InsertVertex(6, false) ;
+
+			for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++)
+			{
+				for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
+				{
+					copyGameBoard[k]->InsertEdge(i + 1 , j + 1, currentGameBoard->edges->GetValue(i , j) , false) ;
+				}
+			}
+		}
+
+		int i_array[currentGameBoard->vertices->Length()] = {0 , 0 , 0 , 0 , 0 , 0} ;
+		int j_array[currentGameBoard->vertices->Length()] = {0 , 0 , 0 , 0 , 0 , 0} ;
 
 		for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++)
 		{
 			for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
 			{
-				copyGameBoard.InsertEdge(i + 1 , j + 1, currentGameBoard->edges->GetValue(i , j) , false) ;
-				// std::cout << currentGameBoard->edges->GetValue(i , j) << " \n" ;
+				if(j_array[j] == 0 || i_array[i] == 0)
+				{
+					if (copyGameBoard[move_count]->InsertEdge(i + 1 , j + 1 , nextPlayer , false)) 
+					{
+						move_count++ ;
+						j_array[i] = 1 ;
+						i_array[j] = 1 ;
+					}
+				}
 			}
 		}
 
-		copyGameBoard.Print() ;
+		std::cout << "[+] POSSIBLE GAME BOARDS: \n\n" ;
+
+		for (int i = 0 ; i < move_count ; i++)
+		{
+			copyGameBoard[i]->Print() ;
+		}
+
+		// Graph<int> nextGameBoard = copyGameBoard ;
+
+		// nextGameBoard.Print() ;
 	}
 
 	Dynamic1DArray<GameState*>* GetChildren() { return children ; } ;

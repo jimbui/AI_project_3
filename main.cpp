@@ -85,7 +85,7 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 			break ;
 		}
 
-		gameBoard->Expand() ;
+		gameBoard->Expand(currentPlayer) ;
 
 		cout << endl;
 

@@ -481,8 +481,10 @@ public:
 			}
 
 			// End line
-			cout << endl;
+			cout << endl ;
 		}
+		
+		cout << endl ;
 	}
 };
 
