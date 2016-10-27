@@ -108,10 +108,35 @@ private:
 		}
 	}
 
+	bool ForwardIDFSRecursive(int start, int startingLimit, int v, int playerNum, int depthRemaining, int** depthFlag)
+	{
+		int v1Index = GetVertexIndex(v);
+
+		// Print vertex and mark as visited.
+		cout << "Vertex with value " << v << " visited.  Depth Remaining = " << depthRemaining << endl;
+		(*depthFlag)[v1Index] = depthRemaining;
+
+		// Find next edge
+		if (depthRemaining > 0)
+		{
+			for (int i = 0; i < vertices->Length(); i++)
+			{
+				// int v2Index = GetVertexIndex(i);
+				if (vertices->GetValue(i) == start && depthRemaining - 1 == 0)
+					return true;
+
+				// If v2 exists and has not been visited, go immediately to that vertex if an edge exists.
+				if (vertices->GetValue(i) != -1 && (*depthFlag)[i] != depthRemaining + 1 && edges->GetValue(v1Index, i) == playerNum)
+					ForwardIDFSRecursive(start, startingLimit, vertices->GetValue(i), playerNum, depthRemaining - 1, depthFlag);
+			}
+		}
+	}
+
 public:
 
 	Dynamic1DArray<T>* vertices;
 	Dynamic2DArray<int>* edges;
+
 	Graph()
 	{
 		// vertexCount = 0;
@@ -212,16 +237,17 @@ public:
 		DFSRecursive(v, &visited);
 	}
 
-	void ForwardIDFS(int v, int limit)
+	// Returns whether there is a triangle anywhere in the graph.
+	bool TriangleDetection(int v, int playerNum)
 	{
 		cout << "Forward IDFS:" << endl << endl;
 
-		bool* visited = new bool[vertices->Length()];
+		int* depthFlag = new int[vertices->Length()];
 
 		for (int i = 0; i < vertices->Length(); i++)
-			visited[i] = false;
+			depthFlag[i] = -2;
 
-		DFSRecursive(v, &visited);
+		return ForwardIDFSRecursive(v, 3, v, playerNum, 3, &depthFlag);
 	}
 
 	// Performs standard BFS on Graph
@@ -274,48 +300,19 @@ public:
 
 	bool TriangleDetection()
 	{
-		int v = 0 ;
+		// int v = 0 ;
 		// Get all vertices and perform depth-limited BFS on each.
 		for (int i = 0; i < vertices->Length(); i++)
 		{
 			// Do for both players' edges.
 			for (int j = 1; j <= 2; j++)
 			{
-				int* visitedDepth = new int[vertices->Length()];
-				int currentDepth = 0;
-
-				for (int k = 0; k < vertices->Length(); k++)
-					visitedDepth[k] = 0;
-
-				int start = i;
-
-				// Print vertex and mark as visited.
-				cout << "Vertex with value " << v << " visited.  Depth = " << currentDepth << endl;
-				visitedDepth[start] = currentDepth;
-
-				// Enqueue starting vertex index + depth
-				queue<int> q;
-				q.push(start);
-
-				// BFS by index...
-				while (q.size() > 0)
-				{
-					int v1Index = q.front();
-					q.pop();
-
-					for (int k = 0; k < vertices->Length(); k++)
-					{
-						if (vertices->GetValue(k) != -1 /*&& !visited[i]*/)
-						{
-							// cout << "Vertex with value " << vertices->GetValue(i) << " visited." << endl;
-							// visited[i] = true;
-
-							q.push(vertices->GetValue(k));
-						}
-					}
-				}
+				if (TriangleDetection(vertices->GetValue(i), j))
+					return true;
 			}
 		}
+
+		return false;
 	}
 
 	// End Debug-Only Accessors ------------------------------------------
@@ -481,10 +478,10 @@ public:
 			}
 
 			// End line
-			cout << endl ;
+			cout << endl;
 		}
-		
-		cout << endl ;
+
+		cout << endl;
 	}
 };
 
