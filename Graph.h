@@ -14,8 +14,6 @@
 template<class T> class Graph
 {
 private:
-	Dynamic1DArray<T>* vertices;
-	Dynamic2DArray<int>* edges;
 
 	/*int arraySize;
 	int vertexCount;*/
@@ -111,6 +109,9 @@ private:
 	}
 
 public:
+
+	Dynamic1DArray<T>* vertices;
+	Dynamic2DArray<int>* edges;
 	Graph()
 	{
 		// vertexCount = 0;
@@ -270,8 +271,10 @@ public:
 	}
 
 	// Checks the entire graph for triangles.
+
 	bool TriangleDetection()
 	{
+		int v = 0 ;
 		// Get all vertices and perform depth-limited BFS on each.
 		for (int i = 0; i < vertices->Length(); i++)
 		{
