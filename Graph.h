@@ -4,6 +4,7 @@
 #define GRAPH_H
 
 #include <iostream>
+#include <string>
 #include <queue>
 #include <fstream>
 #include <math.h>
@@ -22,15 +23,15 @@ private:
 	// Helper Methods ----------------------------------------------
 
 	// Gets the field width of an integer value.
-	int GetFieldWidth(int intValue)
+	int GetFieldWidth(string stringValue)
 	{
-		return (intValue > 1 ? (int)log10(intValue) + 1 : (intValue > -1 ? 1 : (int)log10(abs(intValue)) + 2));
+		return stringValue.length();  // (intValue > 1 ? (int)log10(intValue) + 1 : (intValue > -1 ? 1 : (int)log10(abs(intValue)) + 2));
 	}
 
 	// Gets a string of spaces from a desired field with and integer input
-	string GetFormatting(int intValue, int fieldWidth)
+	string GetFormatting(string stringValue, int fieldWidth)
 	{
-		int intWidth = GetFieldWidth(intValue);
+		int intWidth = GetFieldWidth(stringValue);
 		string spaceString = "";
 
 		for (int i = 0; i < fieldWidth - intWidth; i++)
@@ -210,15 +211,28 @@ public:
 		DFSRecursive(v, &visited);
 	}
 
-	// Performs standard BFS on Graph
-	void BFS(int v)
+	void ForwardIDFS(int v, int limit)
 	{
-		cout << "BFS:" << endl << endl;
+		cout << "Forward IDFS:" << endl << endl;
 
 		bool* visited = new bool[vertices->Length()];
 
 		for (int i = 0; i < vertices->Length(); i++)
 			visited[i] = false;
+
+		DFSRecursive(v, &visited);
+	}
+
+	// Performs standard BFS on Graph
+	void BFS(int v)
+	{
+		cout << "BFS:" << endl << endl;
+
+		int* visited = new int[vertices->Length()];
+		int currentDepth = 0;
+
+		for (int i = 0; i < vertices->Length(); i++)
+			visited[i] = 0;
 
 		int start = GetVertexIndex(v);
 
@@ -229,11 +243,12 @@ public:
 		}
 
 		// Print vertex and mark as visited.
-		cout << "Vertex with value " << v << " visited." << endl;
-		visited[start] = true;
+		cout << "Vertex with value " << v << " visited.  Current Depth = " << currentDepth << endl;
+		visited[start] = 1;
 
 		// Enqueue starting vertex index
 		queue<int> q;
+
 		q.push(start);
 
 		while (q.size() > 0)
@@ -243,12 +258,58 @@ public:
 
 			for (int i = 0; i < vertices->Length(); i++)
 			{
-				if (vertices->GetValue(i) != -1 && !visited[i])
+				if (vertices->GetValue(i) != -1 && visited[i] == 0 && edges->GetValue(v1Index, i) != -1)
 				{
-					cout << "Vertex with value " << vertices->GetValue(i) << " visited." << endl;
-					visited[i] = true;
+					cout << "Vertex with value " << vertices->GetValue(i) << " visited.  Current Depth = " << currentDepth << endl;
+					visited[i] = 1;
 
 					q.push(vertices->GetValue(i));
+				}
+			}
+		}
+	}
+
+	// Checks the entire graph for triangles.
+	bool TriangleDetection()
+	{
+		// Get all vertices and perform depth-limited BFS on each.
+		for (int i = 0; i < vertices->Length(); i++)
+		{
+			// Do for both players' edges.
+			for (int j = 1; j <= 2; j++)
+			{
+				int* visitedDepth = new int[vertices->Length()];
+				int currentDepth = 0;
+
+				for (int k = 0; k < vertices->Length(); k++)
+					visitedDepth[k] = 0;
+
+				int start = i;
+
+				// Print vertex and mark as visited.
+				cout << "Vertex with value " << v << " visited.  Depth = " << currentDepth << endl;
+				visitedDepth[start] = currentDepth;
+
+				// Enqueue starting vertex index + depth
+				queue<int> q;
+				q.push(start);
+
+				// BFS by index...
+				while (q.size() > 0)
+				{
+					int v1Index = q.front();
+					q.pop();
+
+					for (int k = 0; k < vertices->Length(); k++)
+					{
+						if (vertices->GetValue(k) != -1 /*&& !visited[i]*/)
+						{
+							// cout << "Vertex with value " << vertices->GetValue(i) << " visited." << endl;
+							// visited[i] = true;
+
+							q.push(vertices->GetValue(k));
+						}
+					}
 				}
 			}
 		}
@@ -350,7 +411,8 @@ public:
 					}
 					else
 					{
-						cout << "    Edge already exists. \n" << endl;
+						if (showOutput)
+							cout << "    Edge already exists. \n" << endl;
 
 						return false;
 					}
@@ -362,18 +424,18 @@ public:
 	// Display -----------------------------------------------------
 	void Print()
 	{
-		cout << "    Graph Vertices: \n" << endl;
+		//cout << "    Graph Vertices: \n" << endl;
 
-		if (vertices->Length() == 0)
-		{
-			cout << "        Graph is empty." << endl;
-			// return;
-		}
+		//if (vertices->Length() == 0)
+		//{
+		//	cout << "        Graph is empty." << endl;
+		//	// return;
+		//}
 
-		for (int i = 0; i < vertices->Length(); i++)
-			cout << "        Vertex[" << i << "] = " << vertices->GetValue(i) << endl;
+		//for (int i = 0; i < vertices->Length(); i++)
+		//	cout << "        Vertex[" << i << "] = " << vertices->GetValue(i) << endl;
 
-		cout << endl;
+		//cout << endl;
 
 		cout << "    Graph Edges: \n" << endl;
 
@@ -397,20 +459,21 @@ public:
 					if (j > 1)  // Print Underscores
 					{
 						if (i == 0)
-							cout << GetFormatting(vertices->GetValue(j - 2), 5).c_str() << vertices->GetValue(j - 2);
+							cout << GetFormatting(to_string(vertices->GetValue(j - 2)), 5).c_str() << vertices->GetValue(j - 2);
 						if (i == 1)
 							cout << "_____";  // 5 underscores
 					}
 					if (i > 1)
 					{
 						if (j == 0)
-							cout << "    " << GetFormatting(vertices->GetValue(i - 2), 5).c_str() << vertices->GetValue(i - 2);
+							cout << "    " << GetFormatting(to_string(vertices->GetValue(i - 2)), 5).c_str() << vertices->GetValue(i - 2);
 						if (j == 1)
 							cout << "    |";  // 1 right boundary
 					}
 
 					if (j > 1 && i > 1)  // Print values
-						cout << GetFormatting(edges->GetValue(i - 2, j - 2), 5).c_str() << edges->GetValue(i - 2, j - 2);
+						cout << GetFormatting((edges->GetValue(i - 2, j - 2) != -1 ? to_string(edges->GetValue(i - 2, j - 2)) : "-"), 5).c_str() 
+							<< (edges->GetValue(i - 2, j - 2) == -1 ? "-" : to_string(edges->GetValue(i - 2, j - 2)));
 				}
 			}
 
