@@ -404,9 +404,9 @@ public:
 					if (i > 1)
 					{
 						if (j == 0)
-							cout << GetFormatting(vertices->GetValue(i - 2), 5).c_str() << vertices->GetValue(i - 2);
+							cout << "    " << GetFormatting(vertices->GetValue(i - 2), 5).c_str() << vertices->GetValue(i - 2);
 						if (j == 1)
-							cout << "        |";  // 1 right boundary
+							cout << "    |";  // 1 right boundary
 					}
 
 					if (j > 1 && i > 1)  // Print values
