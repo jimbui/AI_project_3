@@ -1,6 +1,10 @@
 #include <iostream>
 
+#include "GameTree.h"
+#include "Graph.h"
 #include "GameState.h"
+#include "Dynamic1DArray.h"
+#include "Dynamic2DArray.h"
 #include <time.h>
 
 using namespace std ;
@@ -21,7 +25,7 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 	graffiti->InsertVertex(5, false) ;
 	graffiti->InsertVertex(6, false) ;*/
 
-	GameState* gameBoard = new GameState(NULL, graffiti) ; // store graph in game board
+	GameState* gameBoard = new GameState(NULL, graffiti, 15) ; // store graph in game board
 
 	bool isPlayerOne = false ; // this is the device for taking turns.
 
@@ -72,7 +76,7 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		*/
 
-		gameBoard->Expand(currentPlayer) ; // this shows all the possible moves.
+		gameBoard->Expand(currentPlayer, currentPlayer, turn, true) ; // this shows all the possible moves.
 
 		cout << "[+] It's player " << currentPlayer << "'s turn. \n\n" ;
 
@@ -105,6 +109,8 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		cout << endl;
 
+		gameBoard->GetChildren()->Clear();
+
 		std::cout << "/**************************************** ABOVE IS TURN " << turn << " **************************************************/ \n\n" ;
 
 		turn++ ;
@@ -119,13 +125,85 @@ int main(void)
          << "/***********************************************************************************************************/\n"
 		 << " \n" ;
 
-	Play2PlayerGame() ;
+	// How many graphs can safely be stored?
 
-	// Graph<int>* g = new Graph<int>();
+	 /*Graph<int>* g = new Graph<int>();
 
-	// g->BuildGameGraph();
+	 g->BuildGameGraph();
 
-	// Graph<int>* h = g->Copy();
+	 Dynamic1DArray<GameState*>* gs = new Dynamic1DArray<GameState*>(NULL);
+
+	 for (int i = 0; i < 100000; i++)
+		 gs->Add(new GameState(NULL, g->Copy()));
+
+	 gs->Clear();
+	 delete gs;
+
+	 gs = new Dynamic1DArray<GameState*>(NULL);
+
+	 for (int i = 0; i < 100000; i++)
+		 gs->Add(new GameState(NULL, g->Copy()));
+
+	 gs->Clear();
+	 delete gs;
+
+	 gs = new Dynamic1DArray<GameState*>(NULL);
+
+	 for (int i = 0; i < 100000; i++)
+		 gs->Add(new GameState(NULL, g->Copy()));
+
+	 gs->Clear();
+	 delete gs;*/
+
+	// Initialize depth bounds for search tree.  DO NOT DELETE!!!!! ========================================================
+	Dynamic1DArray<int>* depthBounds = new Dynamic1DArray<int>(-1, 15);
+
+	depthBounds->Add(3);
+	depthBounds->Add(3);
+	depthBounds->Add(3);
+	depthBounds->Add(3);
+	depthBounds->Add(4);
+	depthBounds->Add(4);
+	depthBounds->Add(4);
+	depthBounds->Add(4);
+	depthBounds->Add(5);
+	depthBounds->Add(5);
+	depthBounds->Add(6);
+	depthBounds->Add(6);
+	depthBounds->Add(6);
+	depthBounds->Add(6);
+	depthBounds->Add(6);
+	// =====================================================================================================================
+
+	Graph<int>* g = new Graph<int>();
+
+	g->BuildGameGraph();
+
+	GameState* gs = new GameState(NULL, g->Copy(), 15);
+
+	GameTree* gt;
+	int player = 1;
+
+	for (int i = 0; i < 15; i++)
+	{
+		gs->GameBoard()->Print();
+		cout << "Winner:  " << (gs->GameBoard()->TriangleDetected(1) ? "Player 2" : (gs->GameBoard()->TriangleDetected(2) ? "Player 1" : "NIL")) << endl << endl;
+
+		gt = new GameTree(gs->Copy());
+		gt->BuildTree(i + 1, depthBounds->GetValue(i), player, false);
+		gs = gt->BestMove();
+
+		delete gt;
+
+		if (gs != NULL)
+		{
+			player = (player == 1 ? 2 : 1);
+		}
+		else
+			break;
+	}
+
+	// Play2PlayerGame() ;
 
 	// Create another test graph.
 

@@ -4,10 +4,11 @@
 #define DYNAMIC1DARRAY_H
 
 #include <iostream>
+// #include <type_traits>
 
 using namespace std;
 
-template<class T> class Dynamic1DArray
+template<typename T> class Dynamic1DArray
 {
 private:
 	// Value of element that does not exist
@@ -35,6 +36,8 @@ private:
 
 		arraySize *= 2;
 
+		delete DynArray;
+
 		return newDynArray;
 	}
 
@@ -54,31 +57,42 @@ private:
 
 		arraySize /= 2;
 
+		delete DynArray;
+
 		return newDynArray;
 	}
 
 public:
-	Dynamic1DArray(T DefaultValue)
+	Dynamic1DArray(T DefaultValue, int startingSize)
 	{
 		defaultValue = DefaultValue;
 		numElements = 0;
-		arraySize = 1;
+		arraySize = startingSize + 1;
 
 		dynArray = new T[arraySize];
 
-		dynArray[0] = defaultValue;
+		for (int i = 0; i < arraySize; i++)
+			dynArray[i] = defaultValue;
 	}
 
 	// Destructor
 	~Dynamic1DArray()
 	{
-		delete[] dynArray;
+		/*for (int i = 0; i < arraySize; i++)
+		{
+			delete dynArray[i];
+		}*/
+
+		/*if (defaultValue == NULL)
+			Clear();*/
+
+		delete dynArray;
 	}
 
 	// Deep copy
 	Dynamic1DArray* Copy()
 	{
-		Dynamic1DArray* copiedArray = new Dynamic1DArray(defaultValue);
+		Dynamic1DArray* copiedArray = new Dynamic1DArray(defaultValue, numElements);
 
 		for (int i = 0; i < numElements; i++)
 			copiedArray->Add(dynArray[i]);
@@ -154,7 +168,10 @@ public:
 	// Clears the array.
 	void Clear()
 	{
-		delete[] dynArray;
+		for (int i = 0; i < arraySize; i++)
+			delete dynArray[i];
+
+		delete dynArray;
 
 		numElements = 0;
 		arraySize = 1;
@@ -163,5 +180,7 @@ public:
 		dynArray[0] = defaultValue;
 	}
 };
+
+
 
 #endif

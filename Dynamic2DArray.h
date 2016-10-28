@@ -7,7 +7,7 @@
 
 using namespace std;
 
-template<class T> class Dynamic2DArray
+template<typename T> class Dynamic2DArray
 {
 private:
 	// Value of element that does not exist
@@ -41,7 +41,11 @@ private:
 				else
 					newDynArray[i][j] = defaultValue;
 			}
+
+			delete DynArray[i];
 		}
+
+		delete DynArray;
 
 		arraySizeX *= 2;
 
@@ -65,7 +69,11 @@ private:
 				else
 					newDynArray[i][j] = defaultValue;
 			}
+
+			// delete DynArray[i];
 		}
+
+		delete DynArray;
 
 		arraySizeY *= 2;
 
@@ -73,7 +81,7 @@ private:
 	}
 
 public:
-	Dynamic2DArray(T DefaultValue, bool IsSquare)
+	Dynamic2DArray(T DefaultValue, bool IsSquare, int startingSizeX, int startingSizeY)
 	{
 		defaultValue = DefaultValue;
 		isSquare = IsSquare;
@@ -81,27 +89,44 @@ public:
 		numElementsX = 0;
 		numElementsY = 0;
 
-		arraySizeX = 1;
-		arraySizeY = 1;
+		arraySizeX = startingSizeX;
+		arraySizeY = startingSizeY;
 
 		dynArray = new T*[arraySizeY];
 
 		for (int i = 0; i < arraySizeY; i++)
+		{
 			dynArray[i] = new T[arraySizeX];
 
-		dynArray[0][0] = defaultValue;
+			for (int j = 0; j < arraySizeX; j++)
+				dynArray[i][j] = defaultValue;
+		}
 	}
 
 	// Destructor
+
 	~Dynamic2DArray()
 	{
-		delete[] dynArray;
+		for (int i = 0; i < arraySizeY; i++)
+		{
+			/*if (defaultValue == NULL)
+			{
+				for (int j = 0; j < arraySizeX; j++)
+				{
+					delete dynArray[i][j];
+				}
+			}*/
+
+			delete dynArray[i];		
+		}
+
+		delete dynArray;
 	}
 
 	// Deep copy
 	Dynamic2DArray* Copy()
 	{
-		Dynamic2DArray* copiedArray = new Dynamic2DArray(defaultValue, isSquare);
+		Dynamic2DArray* copiedArray = new Dynamic2DArray(defaultValue, isSquare, arraySizeX, arraySizeY);
 
 		for (int i = 0; i < numElementsY; i++)
 			for (int j = 0; j < numElementsX; j++)
@@ -193,7 +218,14 @@ public:
 	void Clear()
 	{
 		for (int i = 0; i < arraySizeY; i++)
-			delete[] dynArray[i];
+		{
+			for (int j = 0; j < arraySizeX; j++)
+				delete dynArray[i][j];
+
+			delete dynArray[i];
+		}
+
+		delete dynArray;
 
 		numElementsX = 0;
 		numElementsY = 0;

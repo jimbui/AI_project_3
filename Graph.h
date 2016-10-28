@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <queue>
 #include <fstream>
 #include <math.h>
@@ -152,8 +153,8 @@ public:
 		// arraySize = sz;
 
 		// vertices = new int[arraySize];
-		vertices = new Dynamic1DArray<T>(-1);
-		edges = new Dynamic2DArray<int>(-1, true);
+		vertices = new Dynamic1DArray<T>(-1, 7);
+		edges = new Dynamic2DArray<int>(-1, true, 7, 7);
 
 		/*edges = new int*[arraySize];
 
@@ -510,6 +511,60 @@ public:
 		}
 	}
 
+	// Added to reduce memory leakage.
+	bool RemoveEdge(int v1, int v2, bool showOutput)
+	{
+		if (v1 == v2) // cannot remove edge between the same vertices.
+		{
+			return false;
+		}
+		else
+		{
+			// Try to delete edge between existing vertices
+			int vertex1Index = -1, vertex2Index = -1;
+
+			for (int i = 0; i < vertices->Length(); i++)
+			{
+				if (vertices->GetValue(i) == v1)
+					vertex1Index = i;
+				if (vertices->GetValue(i) == v2)
+					vertex2Index = i;
+			}
+
+			if (vertex1Index == -1 || vertex2Index == -1)
+			{
+				if (showOutput)
+					cout << "    Either one or both of the vertices do not exist. \n" << endl;
+
+				return false;
+			}
+			else
+			{
+				if (edges->GetValue(vertex1Index, vertex2Index) != edges->DefaultValue())
+				{
+					if (showOutput)
+						cout << "    Edge from [" << vertices->GetValue(vertex1Index) << "] --(" << edges->GetValue(vertex1Index, vertex2Index) << ")--> ["
+						<< vertices->GetValue(vertex2Index) << "] deleted successfully. \n" << endl;
+					if (showOutput)
+						cout << "    Edge from [" << vertices->GetValue(vertex2Index) << "] --(" << edges->GetValue(vertex2Index, vertex1Index) << ")--> ["
+						<< vertices->GetValue(vertex1Index) << "] deleted successfully. \n" << endl;
+
+					edges->ModifyOrInsertAt(vertex1Index, vertex2Index, edges->DefaultValue()); // edges[vertex1Index][vertex2Index] = edgeWeight;
+					edges->ModifyOrInsertAt(vertex2Index, vertex1Index, edges->DefaultValue()); // since this graph is undirected , this adds the other edge.
+
+					return true;
+				}
+				else
+				{
+					if (showOutput)
+						cout << "    Edge does not exist. \n" << endl;
+
+					return false;
+				}
+			}
+		}
+	}
+
 	// Display -----------------------------------------------------
 	void Print()
 	{
@@ -548,21 +603,41 @@ public:
 					if (j > 1)  // Print Underscores
 					{
 						if (i == 0)
-							cout << GetFormatting(to_string(vertices->GetValue(j - 2)), 5).c_str() << vertices->GetValue(j - 2);
+						{
+							int val = vertices->GetValue(j - 2);
+							stringstream ss;
+							ss << val;
+							string sting = ss.str();
+
+							cout << GetFormatting(sting, 5).c_str() << val;
+						}
 						if (i == 1)
 							cout << "_____";  // 5 underscores
 					}
 					if (i > 1)
 					{
 						if (j == 0)
-							cout << "    " << GetFormatting(to_string(vertices->GetValue(i - 2)), 5).c_str() << vertices->GetValue(i - 2);
+						{
+							int val = vertices->GetValue(i - 2);
+							stringstream ss;
+							ss << val;
+							string sting = ss.str();
+
+							cout << "    " << GetFormatting(sting, 5).c_str() << val;
+						}
 						if (j == 1)
 							cout << "    |";  // 1 right boundary
 					}
 
 					if (j > 1 && i > 1)  // Print values
-						cout << GetFormatting((edges->GetValue(i - 2, j - 2) != -1 ? to_string(edges->GetValue(i - 2, j - 2)) : "-"), 5).c_str() 
-							<< (edges->GetValue(i - 2, j - 2) == -1 ? "-" : to_string(edges->GetValue(i - 2, j - 2)));
+					{
+						int val = edges->GetValue(i - 2, j - 2);
+						stringstream ss;
+						ss << val;
+						string sting = ss.str();
+
+						cout << GetFormatting((val != -1 ? sting : "-"), 5).c_str() << (val == -1 ? "-" : sting);
+					}
 				}
 			}
 
