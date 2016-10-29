@@ -42,9 +42,12 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 	while (true) 
 	{
-		int startVertex ;
-		int endVertex ;
+		int startVertex = 0 ;
+		int endVertex = 0 ;
 		char ui ;
+
+		// player 1 is human player.
+		// player 2 is AI.
 
 		if (isPlayerOne == true) currentPlayer = 1 ;
 		else currentPlayer = 2 ;
@@ -76,23 +79,55 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		*/
 
-		gameBoard->Expand(currentPlayer, currentPlayer, turn, true) ; // this shows all the possible moves.
+		// gameBoard->Expand(currentPlayer, currentPlayer, turn, true) ; // this shows all the possible moves.  doesn't actually do anything else.
 
-		cout << "[+] It's player " << currentPlayer << "'s turn. \n\n" ;
-
-		do // for the love of god , enter an integer.  
+		if (currentPlayer == 1) 
 		{
-			cout << "    Enter starting vertex:  " << endl ;
-			std::cout << " \n        " ;
-			cin >> startVertex ;
-			std::cout << " \n" ;
-			cout << "    Enter ending vertex:  " << endl << endl << "        " ;
-			cin >> endVertex ;
-			std::cout << " \n" ;
+			cout << "[+] It's your turn. \n\n" ;
 
-			if (startVertex == endVertex) std::cout << "    You cannot insert between duplicate edges.\n" ; // this is just the error message.  logical implementation is in "Graph.h".
-		} 
-		while (!gameBoard->GameBoard()->InsertEdge(startVertex, endVertex, currentPlayer, true));
+			do // for the love of god , enter an integer.  
+			{
+				cout << "    Enter starting vertex:  " << endl ;
+				std::cout << " \n        " ;
+				cin >> startVertex ;
+				std::cout << " \n" ;
+				cout << "    Enter ending vertex:  " << endl << endl << "        " ;
+				cin >> endVertex ;
+				std::cout << " \n" ;
+
+				if (startVertex == endVertex) std::cout << "    You cannot insert between duplicate edges.\n" ; // this is just the error message.  logical implementation is in "Graph.h".
+			} 
+			while (!gameBoard->GameBoard()->InsertEdge(startVertex , endVertex , currentPlayer , false)) ;// makes move.
+		}
+
+		else cout << "[+] It's the AI's turn. \n\n" ; // AI MAKES 
+		{
+			GameState* aiBoard = new GameState(NULL, graffiti->Copy(), 15) ; // copies the current gamestate for ai to make calculations.
+			GameTree* aiTree = new GameTree(aiBoard->Copy()) ; // game tree of the current board.
+			aiTree->BuildTree(turn , 3 , currentPlayer , false) ;
+			aiBoard = aiTree->BestMove() ;
+
+			// find difference between the two aiBoard and gameBoard.
+
+			for (int i = 0 ; i < 6 ; i++)
+			{
+				for (int j = 0 ; j < 6 ; j++)
+				{
+					if (startVertex == 0)
+					{
+						if (gameBoard->GameBoard()->edges->GetValue(i , j) != aiBoard->GameBoard()->edges->GetValue(i , j))
+						{
+							startVertex = i ;
+							endVertex = j ;
+						}
+					}
+				}
+			}
+
+			gameBoard->GameBoard()->InsertEdge(startVertex , endVertex , currentPlayer , false) ;
+			delete aiTree ;
+			delete aiBoard ;
+		}
 
 		isPlayerOne = !isPlayerOne ; // switches players.  this really should be moved to the end , but would break alot of functions.
 
@@ -103,7 +138,9 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 
 		if (graffiti->TriangleDetected(currentPlayer)) // lose condition.
 		{
-			std::cout << "[-] PLAYER " << currentPlayer << " HAS LOST THE GAME BY CREATING A TRIANGLE!  GAME EXITING! \n\n" ;
+			if (currentPlayer == 1) std::cout << "[-] YOU HAVE LOST THE GAME BY CREATING A TRIANGLE!  GAME EXITING! \n\n" ;
+			else std::cout << "[-] YOU BEAT THE AI!  CONGRATULATIONS!  GAME EXITING! \n\n" ;
+
 			break ;
 		}
 
@@ -116,6 +153,8 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 		turn++ ;
 	}
 }
+
+
 
 int main(void)
 {
@@ -155,8 +194,28 @@ int main(void)
 	 gs->Clear();
 	 delete gs;*/
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	 /*
+
 	// Initialize depth bounds for search tree.  DO NOT DELETE!!!!! ========================================================
-	Dynamic1DArray<int>* depthBounds = new Dynamic1DArray<int>(-1, 15);
+	Dynamic1DArray<int>* depthBounds = new Dynamic1DArray<int>(-1, 15) ; // depth bound list , iterates through this list.
 
 	depthBounds->Add(3);
 	depthBounds->Add(3);
@@ -175,27 +234,27 @@ int main(void)
 	depthBounds->Add(6);
 	// =====================================================================================================================
 
-	Graph<int>* g = new Graph<int>();
+	Graph<int>* g = new Graph<int>(); // the starting game state.
 
-	g->BuildGameGraph();
+	g->BuildGameGraph(); // 6 vertices.
 
-	GameState* gs = new GameState(NULL, g->Copy(), 15);
+	GameState* gs = new GameState(NULL, g->Copy(), 15) ; // copies the game state.
 
-	GameTree* gt;
-	int player = 1;
+	GameTree* gt; // this is for the AI , for calculations.
+	int player = 1 ;
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 15; i++) // makes 15 random moves.
 	{
 		gs->GameBoard()->Print();
 		cout << "Winner:  " << (gs->GameBoard()->TriangleDetected(1) ? "Player 2" : (gs->GameBoard()->TriangleDetected(2) ? "Player 1" : "NIL")) << endl << endl;
 
 		gt = new GameTree(gs->Copy());
-		gt->BuildTree(i + 1, depthBounds->GetValue(i), player, false);
-		gs = gt->BestMove();
+		gt->BuildTree(i + 1, depthBounds->GetValue(i), player, false); // this is the "random heuristic".
+		gs = gt->BestMove() ; // this makes the move.
 
-		delete gt;
+		delete gt; // if not placed , memory leaks.
 
-		if (gs != NULL)
+		if (gs != NULL) // change player.
 		{
 			player = (player == 1 ? 2 : 1);
 		}
@@ -203,7 +262,19 @@ int main(void)
 			break;
 	}
 
-	// Play2PlayerGame() ;
+	*/
+
+
+
+
+
+
+
+
+
+
+
+	Play2PlayerGame() ;
 
 	// Create another test graph.
 
