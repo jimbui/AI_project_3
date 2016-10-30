@@ -36,9 +36,33 @@ void Play2PlayerGame() // test for playing two player game , hotseat version.
 		isPlayerOne = true;
 	}
 
-	int currentPlayer = -99999; // just a place holder value.
+	int currentPlayer = -99999 ; // just a place holder value.
+	int playerInput  = - 99999 ;
 
-								// start game!
+	while (true)
+	{
+		std::cout << "    Enter 1 for you to start, 2 for the AI to start, or 0 for random start. \n\n" ;
+		cin >> playerInput ;
+
+		if (playerInput == 0)
+		{
+			break ;
+		}
+
+		else if (playerInput == 1) 
+		{
+			isPlayerOne = true ;
+			break ;
+		}
+
+		else if (playerInput == 2) 
+		{
+			isPlayerOne = false ;
+			break ;
+		}
+
+		else std::cout << "    Invalid input, please try again. \n\n" ;
+	}
 
 	while (true)
 	{
@@ -160,7 +184,7 @@ int main(void)
 		<< "/***********************************************************************************************************/\n"
 		<< "/*                                       welcome to the hexagon game!                                      */\n"
 		<< "/***********************************************************************************************************/\n"
-		<< " \n";
+		<< " \n" ;
 
 	/*Graph<int>* g = new Graph<int>();
 	g->BuildGameGraph();
