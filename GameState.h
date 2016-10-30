@@ -14,18 +14,36 @@ private:
 
 	GameState* parent ; // points the parent gamestate that created this game state.
 	Graph<int>* currentGameBoard ; // this is the current board of this board.
+
 	int utilityFcn ; // the heuristic value.
 	
 	// Contains depth flag to determine significance of win and loss?
+	int depth;
+	bool isOnPath;
 
 	Dynamic1DArray<GameState*>* children ; // all the children of this board.  assume max of 15 , not too sure.
 
 	// Add flags as necessary...
 public:
+	// Constructors
 	GameState(GameState* Parent, Graph<int>* GameBoard, int numMovesRemaining)
 	{
 		parent = Parent ;
 		currentGameBoard = GameBoard ;
+		depth = 0;
+		isOnPath = false;
+
+		children = new Dynamic1DArray<GameState*>(NULL, numMovesRemaining);
+		utilityFcn = -1000;  // GetUtility(currentGameBoard, 1, 1);
+	}
+
+	GameState(GameState* Parent, Graph<int>* GameBoard, int numMovesRemaining, int Depth)
+	{
+		parent = Parent;
+		currentGameBoard = GameBoard;
+		depth = Depth;
+		isOnPath = false;
+
 		children = new Dynamic1DArray<GameState*>(NULL, numMovesRemaining);
 		utilityFcn = -1000;  // GetUtility(currentGameBoard, 1, 1);
 	}
@@ -58,8 +76,17 @@ public:
 
 	int Utility() const { return utilityFcn; };
 
-	void SetUtility(int winWeight, int lossWeight, int startingPlayer, int currentPlayer) // this is the heuristic function.
+	bool IsOnPath() const { return isOnPath; };
+
+	int Depth() const { return depth; };
+
+	GameState* Parent() { return parent; };
+
+	void SetUtility(int winWeight, int lossWeight, int moveWeight, int startingPlayer, int currentPlayer) // this is the heuristic function.
 	{
+		// Depth variable used to determine whether node is max.
+		bool isMax = (depth % 2 == 0);
+
 		utilityFcn = 0;
 
 		// Do not expand if move is a win or loss.
@@ -67,12 +94,12 @@ public:
 		{
 			if (currentPlayer == startingPlayer)
 			{
-				utilityFcn = -5;
+				utilityFcn = -lossWeight * 15;
 				return;
 			}
 			else
 			{
-				utilityFcn = 5;
+				utilityFcn = winWeight * 15;
 				return;
 			}
 		}
@@ -107,7 +134,8 @@ public:
 
 		bool sideOfMove = (nextPlayer == startingPlayer);  // Stores whether current move is on opposing side (0) or same side (1).
 
-		Graph<int>* copyGameBoard = currentGameBoard->Copy(); // make 1 boards.  15 because that is the max amount of moves at any given time.
+		// Copy not needed, since one returns to previous state.
+		Graph<int>* copyGameBoard = currentGameBoard; //->Copy(); // make 1 boards.  15 because that is the max amount of moves at any given time.
 
 									   // I made deep copy functions.
 		// for (int k = 0; k < 15; k++) 
@@ -131,9 +159,9 @@ public:
 						i_array[j] = 1;
 
 						if (sideOfMove) // Basic U(n):  If the move is a CPU move and results in loss, decrement utility; else increment because a move is available.
-							utilityFcn += (triangleDetected ? -2 : 1);
+							utilityFcn += (triangleDetected ? -lossWeight : moveWeight);
 						else // Basic U(n):  If the move is a human move and results in a win, increment utility; else decrement because the human has more options.
-							utilityFcn += (triangleDetected ? 2 : -1);
+							utilityFcn += (triangleDetected ? winWeight : -moveWeight);
 
 						// Revert to previous state (to save memory)
 						copyGameBoard->RemoveEdge(i + 1, j + 1, false);
@@ -141,36 +169,15 @@ public:
 				}
 			}
 		}
-
-		
-
-		//for (int i = 0; i < move_count; i++) // this prints the possible boards.
-		//{
-		//	// bool triangleDetected = copyGameBoard[i]->TriangleDetected(nextPlayer);
-
-		//	//if (showOutput)
-		//	//{
-		//	//	std::cout << "   -------------------------------------------\n";
-		//	//	std::cout << "          [" << i + 1 << "]: ";
-
-		//	//	// int numOps = 0;
-
-		//	//	if (triangleDetected) std::cout << "TRIANGLE DETECTED. \n\n";
-		//	//	else std::cout << "triangle not detected. \n\n";
-
-		//	//	copyGameBoard[i]->Print();
-		//	//}
-		//}
-
-		/*for (int i = 0; i < 15; i++)
-			delete copyGameBoard[i];
-
-		delete copyGameBoard;*/
-
-		// return utility;
 	}
 
-	void Expand(int startingPlayer, int currentPlayer, int totalMovesRemaining, bool showOutput)
+	// Sets utility manually.
+	void SetUtility(int uValue)
+	{
+		utilityFcn = uValue;
+	}
+
+	void Expand(int startingPlayer, int currentPlayer, int totalMovesRemaining, bool showOutput, int nextDepth)
 	{
 		// Do not expand if move is a win or loss.
 		if (currentGameBoard->TriangleDetected(currentPlayer))
@@ -185,33 +192,13 @@ public:
 
 		Graph<int>* copyGameBoard; // make 15 boards.  15 because that is the max amount of moves at any given time.
 
-		// I made deep copy functions.
-		/*for (int k = 0 ; k < totalMovesRemaining; k++)*/ copyGameBoard = currentGameBoard->Copy(); // initialize all 1 boards.
-
-		// 1 BOARD GENERATED INITIALLY TO SAVE MEMORY!!!!!!!!!
-
-		//for (int k = 0 ; k < 30 ; k++) // deep copy of edges and vertices from current board to each board.
-		//{
-		//	copyGameBoard[k]->InsertVertex(1, false) ;
-		//	copyGameBoard[k]->InsertVertex(2, false) ;
-		//	copyGameBoard[k]->InsertVertex(3, false) ;
-		//	copyGameBoard[k]->InsertVertex(4, false) ;
-		//	copyGameBoard[k]->InsertVertex(5, false) ;
-		//	copyGameBoard[k]->InsertVertex(6, false) ;
-
-		//	for (int i = 0 ; i < currentGameBoard->vertices->Length() ; i++) 
-		//	{
-		//		for (int j = 0 ; j < currentGameBoard->vertices->Length() ; j++)
-		//		{
-		//			copyGameBoard[k]->InsertEdge(i + 1 , j + 1, currentGameBoard->edges->GetValue(i , j) , false) ;
-		//		}
-		//	}
-		//}
+		// Copy not needed since one returns to previous state.
+		copyGameBoard = currentGameBoard; // ->Copy(); // initialize all 1 boards.
 
 		// to avoid repeats.
 
-		int i_array[6 /*currentGameBoard->vertices->Length()*/] = {0 , 0 , 0 , 0 , 0 , 0} ;
-		int j_array[6 /*currentGameBoard->vertices->Length()*/] = {0 , 0 , 0 , 0 , 0 , 0} ;
+		int i_array[6] = {0 , 0 , 0 , 0 , 0 , 0} ;
+		int j_array[6] = {0 , 0 , 0 , 0 , 0 , 0} ;
 
 		if (showOutput)
 			std::cout << "[+] POSSIBLE GAME BOARDS: \n\n";
@@ -228,7 +215,7 @@ public:
 						j_array[i] = 1 ;
 						i_array[j] = 1 ;
 
-						bool triangleDetected = copyGameBoard->TriangleDetected(nextPlayer);
+						bool triangleDetected = copyGameBoard->TriangleDetected(nextPlayer); // Check to see if the next move for a triangle.
 
 						if (showOutput)
 						{
@@ -243,27 +230,15 @@ public:
 							copyGameBoard->Print();
 						}
 
-						if (!triangleDetected || nextPlayer != currentPlayer)
-							children->Add(new GameState(this, copyGameBoard->Copy(), totalMovesRemaining));
+						/*if (!triangleDetected || nextPlayer != currentPlayer)*/
+						
+						children->Add(new GameState(this, copyGameBoard->Copy(), totalMovesRemaining, nextDepth));
 
 						copyGameBoard->RemoveEdge(i + 1, j + 1, false);
 					}
 				}
 			}
 		}
-
-		//for (int i = 0 ; i < move_count ; i++) // this prints the possible boards.
-		//{
-		//	// bool triangleDetected = copyGameBoard[i]->TriangleDetected(nextPlayer);  // Changed currentPlayer to nextPlayer so that the 
-		//																				// Next player's move would be one checked for triangle
-		//	
-		//	/*else
-		//		delete copyGameBoard[i];*/
-		//}
-
-		// Graph<int> nextGameBoard = copyGameBoard ;
-
-		// nextGameBoard.Print() ;
 	}
 
 	Dynamic1DArray<GameState*>* GetChildren() { return children ; } ;

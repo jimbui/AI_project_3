@@ -452,6 +452,9 @@ public:
 	{
 		if(v1 == v2) // cannot insert edge between the same vertices.
 		{
+			if (showOutput)
+				cout << "    You cannot insert between duplicate edges.\n\n";
+
 			return false ;
 		}
 
